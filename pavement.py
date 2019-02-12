@@ -18,7 +18,7 @@ HERE = path(__file__).dirname().abspath()
 
 setup_params = dict(  # pylint: disable=invalid-name
     name="pygritia",
-    version="0.1.0",
+    version="0.2.0",
     description="Pygritia: Lazy Symbolic Evaluation",
     long_description=open(HERE / 'README.md').read(),
     long_description_content_type="text/markdown",
@@ -31,7 +31,8 @@ setup_params = dict(  # pylint: disable=invalid-name
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
     ],
-    packages=find_packages(),
+    package_data={'pygritia': ['py.typed']},
+    packages=['pygritia'],
 )
 
 options(

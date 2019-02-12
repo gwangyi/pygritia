@@ -1,9 +1,10 @@
 """Pygritia: Lazy evaluation"""
-from .lazy import symbol, lazy_function, lazy_getitem, lazy_setitem, symbols
-from .util import evaluate, update
-from . import lazyop
+from .lazy import (lazy_call, lazy_delattr, lazy_delitem, lazy_getattr,
+                   lazy_getitem, lazy_setattr, lazy_setitem, symbol)
+from .core import evaluate, update
 
 __all__ = [
-    'symbol', 'symbols', 'lazy_function', 'lazy_getitem', 'lazy_setitem',
-    'evaluate', 'update'
+    'evaluate', 'lazy_call', 'lazy_delattr', 'lazy_delitem',
+    'lazy_getattr', 'lazy_getitem', 'lazy_setattr',
+    'lazy_setitem', 'symbol', 'update',
 ]

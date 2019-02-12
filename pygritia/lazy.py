@@ -1,4 +1,4 @@
-from typing import Any, TypeVar
+from typing import Any, TypeVar, cast
 import operator
 from .core import LazyType
 from .symbol import Symbol, SymbolMixin
@@ -16,7 +16,7 @@ class Lazy(SymbolMixin, AttrMixin, ItemMixin, CallMixin,
 
 
 def symbol(name: str, factory: LazyType = Lazy) -> Any:
-    return factory(action=Symbol(name))
+    return cast(Any, factory(action=Symbol(name)))
 
 
 _T = TypeVar('_T')

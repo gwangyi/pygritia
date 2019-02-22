@@ -26,6 +26,7 @@ from .call import (lazy_call, lazy_delattr, lazy_delitem, lazy_getattr,
                    lazy_getitem, lazy_setattr, lazy_setitem)
 from .core import evaluate, update
 from .cases import (If, IfThenElse, Case, Ensure, is_none)
+from .cast import lazy_cast
 from .prop import this
 
 __all__ = (
@@ -33,4 +34,5 @@ __all__ = (
     'lazy_getattr', 'lazy_getitem', 'lazy_setattr',
     'lazy_setitem', 'symbol', 'update', 'this',
     'If', 'IfThenElse', 'Case', 'Ensure', 'is_none',
+    'lazy_cast',
 )

@@ -7,7 +7,6 @@ from paver.easy import *  # pylint: disable=unused-wildcard-import,wildcard-impo
 from paver.options import Bunch
 from paver.path import path
 from paver.setuputils import setup
-from setuptools import find_packages  # type: ignore
 
 if sys.version_info < (3, 7):
     sys.exit("Pygritia requires Python >= 3.7")

@@ -1,9 +1,13 @@
+"""
+Provides :py:class:`Operator` lazy action class
+It makes operators work well in lazy expression
+"""
 from typing import Any, Tuple, TypeVar, cast
 import operator
 from functools import wraps
 from dataclasses import dataclass
 from .util import FORWARD_OPERATORS
-from .core import Lazy, LazyAction, LazyNS, LazyType, evaluate, repr_
+from .core import Lazy, LazyAction, LazyNS, evaluate, repr_
 
 
 @dataclass
@@ -31,14 +35,17 @@ class Operator(LazyAction):
                          ops,
                          repr_(self.operands[1])))
 
-    def evaluate(self, ns: LazyNS) -> Any:
+    def evaluate(self, namespace: LazyNS) -> Any:
         return getattr(operator, self.operator)(
-            *(evaluate(operand, ns) for operand in self.operands))
+            *(evaluate(operand, namespace) for operand in self.operands))
 
 
 _T = TypeVar('_T')
 
 def lazy_operator(method: _T) -> _T:
+    """
+    Make given dunder method to lazy expression with :py:class:`Operator` action.
+    """
     if callable(method) and hasattr(method, '__name__'):
         name = getattr(method, '__name__', '')
 
@@ -50,6 +57,10 @@ def lazy_operator(method: _T) -> _T:
 
 
 def lazy_roperator(method: _T) -> _T:
+    """
+    Make given dunder method to lazy expression with :py:class:`Operator` action.
+    with reversed order
+    """
     if callable(method) and hasattr(method, '__name__'):
         name = getattr(method, '__name__', '')
         name = '__' + name[3:]

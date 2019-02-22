@@ -1,9 +1,21 @@
+"""
+Provides :py:class:`BinaryMixin` mixin class
+It provides binary operator support to the :py:class:`Lazy` class
+"""
 from typing import Any
 from .core import Lazy, LazyMixin
 from .ops import lazy_operator
 
 
 class BinaryMixin(LazyMixin):
+    """
+    Binary operator support
+
+    It contains compare operators(``__lt__``, ``__le__``, ``__eq__``, ``__ne__``, ``__gt__``,
+    ``_ge__``), numeric operators(``__add__``, ``__sub__``, ``__mul__``, ``__matmul__``,
+    ``__div__``, ``__truediv__``, ``__floordiv__``, ``__mod__``, ``__divmod__``, ``__pow__``)
+    and bitwise operators(``__lshift__``, ``__rshift__``, ``__and__``, ``__or__``, ``__xor__``)
+    """
     @lazy_operator
     def __lt__(self, other: Any) -> bool:
         pass  # pragma: no cover

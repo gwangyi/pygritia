@@ -1,7 +1,11 @@
+"""
+Provides :py:class:`AttrMixin` mixin class
+It provides attribute accessor support to the :py:class:`Lazy` class
+"""
 from typing import Any
 import operator
 from dataclasses import dataclass
-from .core import Lazy, LazyAction, LazyMixin, LazyNS, LazyType, evaluate
+from .core import Lazy, LazyAction, LazyMixin, LazyNS, evaluate
 from .util import OPERATORS, getattr_
 
 
@@ -16,20 +20,27 @@ class Attr(LazyAction):
     def __str__(self) -> str:
         return f'{str(self.target)}.{self.attr}'
 
-    def evaluate(self, ns: LazyNS) -> Any:
-        return operator.attrgetter(self.attr)(evaluate(self.target, ns))
+    def evaluate(self, namespace: LazyNS) -> Any:
+        return operator.attrgetter(self.attr)(evaluate(self.target, namespace))
 
-    def update(self, val: Any, ns: LazyNS) -> None:
+    def update(self, val: Any, namespace: LazyNS) -> None:
         if '.' in self.attr:
             prior, attr = self.attr.rsplit('.', 1)
-            obj = operator.attrgetter(prior)(evaluate(self.target, ns))
+            obj = operator.attrgetter(prior)(evaluate(self.target, namespace))
         else:
             attr = self.attr
-            obj = evaluate(self.target, ns)
+            obj = evaluate(self.target, namespace)
         setattr(obj, attr, val)
 
 
 class AttrMixin(LazyMixin):
+    """
+    Attribute access support
+
+    Substitution to lazy expression is not supported
+
+    *NOTICE*: Dunder magic methods are not lazily evaluated and applied to expression object.
+    """
     def __getattribute__(self: Lazy, name: str) -> Lazy:
         if (name.startswith('__') and
                 name.endswith('__') and

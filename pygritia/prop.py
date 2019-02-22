@@ -1,3 +1,6 @@
+"""
+Provides :py:class:`LazyProp` class
+"""
 from typing import Any, Type, Optional
 from .core import LazyAction, LazyMixin, evaluate, update
 from .lazy import Lazy, symbol
@@ -5,6 +8,15 @@ from .util import setattr_
 
 
 class LazyProp(Lazy):
+    """
+    `LazyProp` makes lazy expression as a descriptor
+
+    >>> class A:
+    ...     hello = "hello"
+    ...     world = this.hello + ", world!"
+    >>> A().world
+    hello, world!
+    """
     def __init__(self, action: LazyAction, origin: Optional[LazyMixin] = None) -> None:
         super().__init__(action, origin)
         setattr_(self, '__doc__', str(self))
@@ -19,4 +31,5 @@ class LazyProp(Lazy):
 
 Lazy.register_factory(LazyProp)
 
-this = symbol('this')
+this = symbol('this')  # pylint: disable=invalid-name
+"""Entry point of :py:class:`LazyProp`"""

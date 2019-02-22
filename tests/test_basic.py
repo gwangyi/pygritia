@@ -1,8 +1,10 @@
-from pygritia import *
-from pytest import fixture, raises
+"""Tests for basic operation of lazy expressions"""
+from pytest import raises  # type: ignore
+from pygritia import *  # pylint: disable=unused-wildcard-import,wildcard-import
 
 
 def test_dummy_eval_update():
+    """Test evaluate and update with empty namespace"""
     obj = object()
     assert evaluate(obj, {}) is obj
 
@@ -10,6 +12,7 @@ def test_dummy_eval_update():
         update(obj, 5, {})
 
 def test_symbol():
+    """Test about symbol"""
     assert str(this) == 'this'
     assert repr(this) == '<LazyProp: this>'
     obj = object()
@@ -22,6 +25,7 @@ def test_symbol():
         update(this, 5, {})
 
 def test_operator():
+    """Test about operator"""
     assert str(this + 5) == 'this + 5'
     assert str(~this) == '~this'
     assert str(abs(this)) == 'abs(this)'
@@ -35,10 +39,12 @@ def test_operator():
         evaluate(this / 0, {this: 3})
 
 def test_attr():
+    """Test about attributes"""
     old = object()
     new = object()
 
     class Test:
+        """Target class"""
         val = old
 
     test = Test()
@@ -52,15 +58,18 @@ def test_attr():
         this.val = 5
 
 def test_inner_attr():
+    """Test nested attribute access"""
     old = object()
     new = object()
 
     class InnerTest:
+        """Inner class"""
         val = old
 
     inner = InnerTest()
 
     class Test:
+        """Target class"""
         val = inner
 
     test = Test()
@@ -71,19 +80,24 @@ def test_inner_attr():
     assert inner.val is new
 
 def test_item():
+    """Tests for item access"""
     old = object()
     new = object()
     arr = [old]
     assert str(this[0]) == 'this[0]'
+    assert str(this[:9]) == 'this[:9]'
+    assert str(this[0:9:2]) == 'this[0:9:2]'
     assert evaluate(this[0], {this: arr}) is old
     update(this[0], new, {this: arr})
     assert arr[0] is new
 
 def test_call():
+    """Tests for function call"""
     assert str(this('42')) == "this('42')"
     assert evaluate(this('42'), {this: int}) == 42
 
 def test_lazy_call():
+    """Tests for function call with lazy exprs"""
     @lazy_call
     def my_func(obj: int) -> int:
         return obj * 2
@@ -93,7 +107,9 @@ def test_lazy_call():
     assert evaluate(my_func(this), {this: 42}) == 84
 
 def test_lazy_callable():
+    """Tests for calling callable with lazy exprs"""
     class MyCallable:
+        """Target callable class"""
         def __call__(self, obj: int) -> int:
             return obj // 2
 
@@ -108,10 +124,13 @@ def test_lazy_callable():
         lazy_call(non_callable)
 
 def test_this():
+    """Tests this symbol"""
     class InnerTest:
+        """Inner class"""
         val = 5
 
     class Test:
+        """Target class"""
         this: 'Test'
         first = [1, 2, 3]
         second = InnerTest()

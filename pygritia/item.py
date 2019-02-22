@@ -16,12 +16,12 @@ class Item(LazyAction):
         index = repr_(self.index)
         return f'{target}[{index}]'
 
-    def evaluate(self, ns: LazyNS, factory: LazyType) -> Any:
-        return evaluate(self.target, ns, factory)[evaluate(self.index, ns, factory)]
+    def evaluate(self, ns: LazyNS) -> Any:
+        return evaluate(self.target, ns)[evaluate(self.index, ns)]
 
-    def update(self, val: Any, ns: LazyNS, factory: LazyType) -> None:
-        obj = evaluate(self.target, ns, factory)
-        index = evaluate(self.index, ns, factory)
+    def update(self, val: Any, ns: LazyNS) -> None:
+        obj = evaluate(self.target, ns)
+        index = evaluate(self.index, ns)
         obj[index] = val
 
 

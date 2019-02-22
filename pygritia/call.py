@@ -32,10 +32,10 @@ class Call(LazyAction):
             )
         )
 
-    def evaluate(self, ns: LazyNS, factory: LazyType) -> Any:
-        callable_ = evaluate(self.target, ns, factory)
-        args_ = (evaluate(arg, ns, factory) for arg in self.args)
-        kwargs_ = {key: evaluate(value, ns, factory) for key, value in self.kwargs.items()}
+    def evaluate(self, ns: LazyNS) -> Any:
+        callable_ = evaluate(self.target, ns)
+        args_ = (evaluate(arg, ns) for arg in self.args)
+        kwargs_ = {key: evaluate(value, ns) for key, value in self.kwargs.items()}
         return callable_(*args_, **kwargs_)
 
 
@@ -46,22 +46,19 @@ class CallMixin(LazyMixin):
 
 _T = TypeVar('_T')
 
-def lazy_call_with_factory(factory: LazyType) -> Callable[[_T], _T]:
-    """Decorator that makes function able to handle lazy expr"""
-    def decorator(func: _T) -> _T:
-        if callable(func):
-            func_ = func
+def lazy_call(func: _T) -> _T:
+    if callable(func):
+        func_ = func
 
-            @wraps(func)
-            def wrapped(*args: Any, **kwargs: Any) -> Any:
-                lazy = any(
-                    isinstance(arg, LazyMixin)
-                    for arglist in (args, kwargs.values())
-                    for arg in arglist
-                )
-                if lazy:
-                    return factory(action=Call(func_, args, kwargs))
-                return func_(*args, **kwargs)
-            return cast(_T, wrapped)
-        raise TypeError("lazy_call must be applied to callable")
-    return decorator
+        @wraps(func)
+        def wrapped(*args: Any, **kwargs: Any) -> Any:
+            lazy = any(
+                isinstance(arg, LazyMixin)
+                for arglist in (args, kwargs.values())
+                for arg in arglist
+            )
+            if lazy:
+                return LazyMixin.create(action=Call(func_, args, kwargs))
+            return func_(*args, **kwargs)
+        return cast(_T, wrapped)
+    raise TypeError("lazy_call must be applied to callable")

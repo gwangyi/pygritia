@@ -17,4 +17,6 @@ class LazyProp(Lazy):
     def __set__(self, inst: Any, value: Any) -> None:
         update(self, value, {this: inst})
 
-this = symbol('this', factory=LazyProp)
+Lazy.register_factory(LazyProp)
+
+this = symbol('this')

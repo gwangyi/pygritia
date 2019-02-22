@@ -31,9 +31,9 @@ class Operator(LazyAction):
                          ops,
                          repr_(self.operands[1])))
 
-    def evaluate(self, ns: LazyNS, factory: LazyType) -> Any:
+    def evaluate(self, ns: LazyNS) -> Any:
         return getattr(operator, self.operator)(
-            *(evaluate(operand, ns, factory) for operand in self.operands))
+            *(evaluate(operand, ns) for operand in self.operands))
 
 
 _T = TypeVar('_T')

@@ -1,4 +1,4 @@
-from typing import Any, List, Mapping, Optional, Type, TypeVar, Union, cast
+from typing import Any, Mapping, Optional, Sequence, Type, TypeVar, Union, cast
 from .util import setattr_
 
 
@@ -8,19 +8,20 @@ LazyNS = LazyNamespace
 
 class LazyAction:  # pylint: disable=too-few-public-methods
     """Lazy Expression Handler"""
-    __slots__: List[str] = []
+    __slots__ = ('owner',)
+    owner: 'LazyMixin'
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {str(self)}>"
 
-    def evaluate(self, ns: LazyNamespace, factory: Type['LazyMixin']) -> Any:
+    def evaluate(self, ns: LazyNamespace) -> Any:
         """Evaluate expression
 
         To substitute actual value for specific symbol, give value with keyword argument.
         """
         raise NotImplementedError
 
-    def update(self, val: Any, ns: LazyNamespace, factory: Type['LazyMixin']) -> None:  # pylint: disable=no-self-use
+    def update(self, val: Any, ns: LazyNamespace) -> None:  # pylint: disable=no-self-use
         """Update value of expression
 
         If the expression is readonly, it raises AttributeError
@@ -28,7 +29,19 @@ class LazyAction:  # pylint: disable=too-few-public-methods
         raise AttributeError("expr cannot be updated")
 
 
-class LazyMixin:
+class LazyMeta(type):
+    _factory: 'LazyType'
+
+    @classmethod
+    def register_factory(cls, lazy_factory: 'LazyType') -> None:
+        cls._factory = lazy_factory
+
+    @classmethod
+    def create(cls, action: LazyAction) -> 'LazyMixin':
+        return cls._factory(action=action)
+
+
+class LazyMixin(metaclass=LazyMeta):
     __slots__ = ['__action__', '__weakref__']
     __action__: LazyAction
 
@@ -40,6 +53,7 @@ class LazyMixin:
 
     def __init__(self, action: LazyAction, origin: Optional['LazyMixin'] = None) -> None:
         setattr_(self, '__action__', action)
+        action.owner = self
 
     def __str__(self) -> str:
         return str(self.__action__)
@@ -53,27 +67,23 @@ LazyType = Type[LazyMixin]
 _T = TypeVar('_T')
 
 
-def evaluate(expr: _T, ns: LazyNamespace, factory: Optional[LazyType] = None) -> _T:
+def evaluate(expr: _T, ns: LazyNamespace) -> _T:
     """Evaluate expression
     """
     if isinstance(expr, LazyMixin):
-        if factory is None:
-            factory = type(expr)
-        return cast(_T, expr.__action__.evaluate(ns, factory))
+        return cast(_T, expr.__action__.evaluate(ns))
     return expr
 
 
-def update(expr: _T, val: _T, ns: LazyNamespace, factory: Optional[LazyType] = None) -> None:
+def update(expr: _T, val: _T, ns: LazyNamespace) -> None:
     """Update the value of expression
     """
     if not isinstance(expr, LazyMixin):
         raise TypeError("Expr must be a lazy expression")
-    if factory is None:
-        factory = type(expr)
-    val = evaluate(val, ns, factory)
+    val = evaluate(val, ns)
     if isinstance(val, LazyMixin):
         raise TypeError("Val is not fully evaluated")
-    expr.__action__.update(val, ns, factory)
+    expr.__action__.update(val, ns)
 
 
 def repr_(expr: Any) -> str:

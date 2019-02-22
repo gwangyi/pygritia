@@ -17,8 +17,8 @@ class Symbol(LazyAction):
     def __hash__(self) -> int:
         return id(self)
 
-    def evaluate(self, ns: LazyNS, factory: LazyType) -> Any:
-        symbol_dict = getattr(factory, '_symbol_dict', {})
+    def evaluate(self, ns: LazyNS) -> Any:
+        symbol_dict = getattr(type(self.owner), '_symbol_dict', {})
         if self not in symbol_dict:
             raise KeyError(f"Orphan symbol {self}")
         expr = symbol_dict[self]

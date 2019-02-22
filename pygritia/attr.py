@@ -16,13 +16,13 @@ class Attr(LazyAction):
     def __str__(self) -> str:
         return f'{str(self.target)}.{self.attr}'
 
-    def evaluate(self, ns: LazyNS, factory: LazyType) -> Any:
-        return operator.attrgetter(self.attr)(evaluate(self.target, ns, factory))
+    def evaluate(self, ns: LazyNS) -> Any:
+        return operator.attrgetter(self.attr)(evaluate(self.target, ns))
 
-    def update(self, val: Any, ns: LazyNS, factory: LazyType) -> None:
+    def update(self, val: Any, ns: LazyNS) -> None:
         if '.' in self.attr:
             prior, attr = self.attr.rsplit('.', 1)
-            obj = operator.attrgetter(prior)(evaluate(self.target, ns, factory))
+            obj = operator.attrgetter(prior)(evaluate(self.target, ns))
         else:
             attr = self.attr
             obj = evaluate(self.target, ns)

@@ -10,6 +10,7 @@ paver = "*"
 sphinx = "*"
 pytest = "*"
 pytest-cov = "*"
+twine = "*"
 
 [packages]
 

@@ -55,6 +55,7 @@ def apidoc():
 
     # First, auto-gen additional sources
     if paths.apidir:
+        paths.apidir.rmtree_p()
         sphinxopts = ['-f', '-o', paths.apidir] + options.get("apidoc_opts", [])
         sphinxopts += options.setup.packages
         if not is_sphinx_1_7:

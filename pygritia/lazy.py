@@ -2,7 +2,7 @@
 Provides :py:class:`Lazy` class and :py:func:`symbol`
 """
 from typing import Any, cast
-from .symbol import Symbol
+from .symbols import Symbol
 from .attr import AttrMixin
 from .item import ItemMixin
 from .call import CallMixin

@@ -1,12 +1,18 @@
-from typing import Any, MutableMapping, Optional
-from weakref import WeakValueDictionary
+"""
+Provides :py:class:`Symbol` lazy action class
+It makes operators work well in lazy expression
+
+Action :py:class:`Symbol` does not have corresponding LazyMixin class, because symbol does not
+need any additional feature to lazy expression.
+"""
+from typing import Any
 from dataclasses import dataclass
-from .core import LazyAction, LazyMixin, LazyNS, LazyType
+from .core import LazyAction, LazyNS
 
 
 @dataclass
 class Symbol(LazyAction):
-    """Attr accessor"""
+    """Symbol accessor"""
 
     __slots__ = ['name']
     name: str
@@ -17,22 +23,10 @@ class Symbol(LazyAction):
     def __hash__(self) -> int:
         return id(self)
 
-    def evaluate(self, ns: LazyNS) -> Any:
-        symbol_dict = getattr(type(self.owner), '_symbol_dict', {})
-        if self not in symbol_dict:
-            raise KeyError(f"Orphan symbol {self}")
-        expr = symbol_dict[self]
-        if expr in ns:
-            return ns[expr]
-        if self.name in ns:
-            return ns[self.name]
+    def evaluate(self, namespace: LazyNS) -> Any:
+        expr = self.owner
+        if expr in namespace:
+            return namespace[expr]
+        if self.name in namespace:
+            return namespace[self.name]
         return expr
-
-
-class SymbolMixin(LazyMixin):
-    _symbol_dict: MutableMapping['Symbol', 'LazyMixin'] = WeakValueDictionary()
-
-    def __init__(self, action: LazyAction, origin: Optional[LazyMixin] = None) -> None:
-        super().__init__(action, origin)
-        if isinstance(action, Symbol):
-            type(self)._symbol_dict[action] = self

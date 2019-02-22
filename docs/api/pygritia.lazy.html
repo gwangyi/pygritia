@@ -13,6 +13,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
    
@@ -33,57 +34,31 @@
             
   <div class="section" id="module-pygritia.lazy">
 <span id="pygritia-lazy-module"></span><h1>pygritia.lazy module<a class="headerlink" href="#module-pygritia.lazy" title="Permalink to this headline">¶</a></h1>
-<p>Lazy expression generator</p>
+<p>Provides <a class="reference internal" href="#pygritia.lazy.Lazy" title="pygritia.lazy.Lazy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lazy</span></code></a> class and <a class="reference internal" href="#pygritia.lazy.symbol" title="pygritia.lazy.symbol"><code class="xref py py-func docutils literal notranslate"><span class="pre">symbol()</span></code></a></p>
 <dl class="class">
 <dt id="pygritia.lazy.Lazy">
-<em class="property">class </em><code class="descclassname">pygritia.lazy.</code><code class="descname">Lazy</code><span class="sig-paren">(</span><em>name: str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygritia/lazy.html#Lazy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.lazy.Lazy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pygritia._lazy.Lazy</span></code></p>
-<p>Lazy expression generator</p>
-<p>This class is entrypoint of lazy expression</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Lazy</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span>
-<span class="go">a</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">+</span> <span class="mi">1</span>
-<span class="go">a + 1</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">3</span>
-<span class="go">a + 6</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">b</span>
-<span class="go">a.b</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="go">a(a, 3, b=3)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pygritia.lazy.getattr_">
-<code class="descclassname">pygritia.lazy.</code><code class="descname">getattr_</code><a class="headerlink" href="#pygritia.lazy.getattr_" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return getattr(self, name).</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pygritia.lazy.lazy_function">
-<code class="descclassname">pygritia.lazy.</code><code class="descname">lazy_function</code><span class="sig-paren">(</span><em>func: _T</em><span class="sig-paren">)</span> &#x2192; _T<a class="reference internal" href="../_modules/pygritia/lazy.html#lazy_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.lazy.lazy_function" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decorator that makes function able to handle lazy expr</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pygritia.lazy.setattr_">
-<code class="descclassname">pygritia.lazy.</code><code class="descname">setattr_</code><a class="headerlink" href="#pygritia.lazy.setattr_" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implement setattr(self, name, value).</p>
+<em class="property">class </em><code class="descclassname">pygritia.lazy.</code><code class="descname">Lazy</code><span class="sig-paren">(</span><em>action: pygritia.core.LazyAction</em>, <em>origin: Optional[LazyMixin] = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygritia/lazy.html#Lazy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.lazy.Lazy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pygritia.attr.html#pygritia.attr.AttrMixin" title="pygritia.attr.AttrMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">pygritia.attr.AttrMixin</span></code></a>, <a class="reference internal" href="pygritia.item.html#pygritia.item.ItemMixin" title="pygritia.item.ItemMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">pygritia.item.ItemMixin</span></code></a>, <a class="reference internal" href="pygritia.call.html#pygritia.call.CallMixin" title="pygritia.call.CallMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">pygritia.call.CallMixin</span></code></a>, <a class="reference internal" href="pygritia.unary.html#pygritia.unary.UnaryMixin" title="pygritia.unary.UnaryMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">pygritia.unary.UnaryMixin</span></code></a>, <a class="reference internal" href="pygritia.binary.html#pygritia.binary.BinaryMixin" title="pygritia.binary.BinaryMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">pygritia.binary.BinaryMixin</span></code></a>, <a class="reference internal" href="pygritia.rbinary.html#pygritia.rbinary.ReversedBinaryMixin" title="pygritia.rbinary.ReversedBinaryMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">pygritia.rbinary.ReversedBinaryMixin</span></code></a></p>
+<p>Minimal base class of lazy expressions</p>
+<p>To extend functionality of lazy expressions(i.e. property descriptor from expression),
+create a new class which is derived from this class.</p>
+<p>Each functionality of <a class="reference internal" href="#pygritia.lazy.Lazy" title="pygritia.lazy.Lazy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lazy</span></code></a> is implemented in the base mixin classes.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="pygritia.lazy.symbol">
 <code class="descclassname">pygritia.lazy.</code><code class="descname">symbol</code><span class="sig-paren">(</span><em>name: str</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="../_modules/pygritia/lazy.html#symbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.lazy.symbol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create lazy-evaluatable symbol</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pygritia.lazy.symbols">
-<code class="descclassname">pygritia.lazy.</code><code class="descname">symbols</code><span class="sig-paren">(</span><em>obj: Any</em><span class="sig-paren">)</span> &#x2192; Optional[Set[str]]<a class="reference internal" href="../_modules/pygritia/lazy.html#symbols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.lazy.symbols" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return symbols not resolved.</p>
-<p>If given object is not a lazy expr, returns None.</p>
+<dd><p>Create symbol for lazy expression</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Newly created symbol expression</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Any</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -141,7 +116,7 @@
       &copy;2019, Sungkwang Lee.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

@@ -1,0 +1,195 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>pygritia.cases &#8212; Pygritia 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for pygritia.cases</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Provides :py:class:`CasesAction` action class</span>
+<span class="sd">It provides several assignable conditional expression</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="k">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">.core</span> <span class="k">import</span> <span class="n">LazyAction</span><span class="p">,</span> <span class="n">LazyNS</span><span class="p">,</span> <span class="n">evaluate</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="n">repr_</span>
+<span class="kn">from</span> <span class="nn">.call</span> <span class="k">import</span> <span class="n">lazy_call</span>
+<span class="kn">from</span> <span class="nn">.lazy</span> <span class="k">import</span> <span class="n">Lazy</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">CasesAction</span><span class="p">(</span><span class="n">LazyAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cases action&quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;condition&#39;</span><span class="p">,</span> <span class="s1">&#39;cases&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span>
+
+    <span class="n">condition</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="sd">&quot;&quot;&quot;Condition&quot;&quot;&quot;</span>
+    <span class="n">cases</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;Condition to value mapping&quot;&quot;&quot;</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="sd">&quot;&quot;&quot;Default value when no case is matched&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">condition</span> <span class="o">=</span> <span class="n">repr_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cases</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">condition</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;bool(&#39;</span> <span class="ow">and</span> <span class="n">condition</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span>
+                <span class="n">condition</span> <span class="o">=</span> <span class="n">condition</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">condition</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;is_none(&#39;</span> <span class="ow">and</span> <span class="n">condition</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">condition</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">repr_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;Ensure(</span><span class="si">{condition[8:-1]}</span><span class="s1">)&#39;</span>
+            <span class="n">cond</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cases</span><span class="o">.</span><span class="n">items</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">cond</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">cond_</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cond_</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39; == {repr_(cond)}&#39;</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;If(</span><span class="si">{condition}{cond_}</span><span class="s1">, {repr_(value)})&#39;</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">f</span><span class="s1">&#39;IfThenElse(</span><span class="si">{condition}{cond_}</span><span class="s1">, &#39;</span>
+                    <span class="n">f</span><span class="s1">&#39;{repr_(value)}, {repr_(self.default)})&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">f</span><span class="s1">&#39;Case(</span><span class="si">{condition}</span><span class="s1">, {{&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{repr_(cond)}: {repr_(value)}&#39;</span>
+                          <span class="k">for</span> <span class="n">cond</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cases</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="o">+</span>
+                <span class="n">f</span><span class="s1">&#39;}}, {repr_(self.default)})&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">:</span> <span class="n">LazyNS</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="n">cond</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cases</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span> <span class="o">==</span> <span class="n">cond</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">namespace</span><span class="p">:</span> <span class="n">LazyNS</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cond</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cases</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span> <span class="o">==</span> <span class="n">cond</span><span class="p">:</span>
+                <span class="n">update</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+
+
+<span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;_T&#39;</span><span class="p">)</span>
+<span class="n">_U</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;_U&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># pylint: disable=invalid-name</span>
+<span class="n">_bool</span> <span class="o">=</span> <span class="n">lazy_call</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="If"><a class="viewcode-back" href="../../api/pygritia.cases.html#pygritia.If">[docs]</a><span class="k">def</span> <span class="nf">If</span><span class="p">(</span><span class="n">cond</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">_T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_T</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;value if cond else None&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">Lazy</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">CasesAction</span><span class="p">(</span><span class="n">_bool</span><span class="p">(</span><span class="n">cond</span><span class="p">),</span> <span class="p">{</span><span class="kc">True</span><span class="p">:</span> <span class="n">value</span><span class="p">},</span> <span class="kc">None</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="IfThenElse"><a class="viewcode-back" href="../../api/pygritia.cases.html#pygritia.IfThenElse">[docs]</a><span class="k">def</span> <span class="nf">IfThenElse</span><span class="p">(</span><span class="n">cond</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">true</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="n">false</span><span class="p">:</span> <span class="n">_U</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_U</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;true if cond else false&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">Lazy</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">CasesAction</span><span class="p">(</span><span class="n">_bool</span><span class="p">(</span><span class="n">cond</span><span class="p">),</span> <span class="p">{</span><span class="kc">True</span><span class="p">:</span> <span class="n">true</span><span class="p">},</span> <span class="n">false</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="Case"><a class="viewcode-back" href="../../api/pygritia.cases.html#pygritia.Case">[docs]</a><span class="k">def</span> <span class="nf">Case</span><span class="p">(</span><span class="n">cond</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="n">cases</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">_U</span><span class="p">],</span> <span class="n">default</span><span class="p">:</span> <span class="n">_U</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_U</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;cases.get(cond, default)&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_U</span><span class="p">,</span> <span class="n">Lazy</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">CasesAction</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">cases</span><span class="p">,</span> <span class="n">default</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="is_none"><a class="viewcode-back" href="../../api/pygritia.cases.html#pygritia.is_none">[docs]</a><span class="nd">@lazy_call</span>
+<span class="k">def</span> <span class="nf">is_none</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;obj is None&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Ensure"><a class="viewcode-back" href="../../api/pygritia.cases.html#pygritia.Ensure">[docs]</a><span class="k">def</span> <span class="nf">Ensure</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">default</span><span class="p">:</span> <span class="n">_T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;obj if obj is not None else default&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">Lazy</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">CasesAction</span><span class="p">(</span><span class="n">is_none</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="p">{</span><span class="kc">True</span><span class="p">:</span> <span class="n">default</span><span class="p">},</span> <span class="n">obj</span><span class="p">)))</span></div>
+<span class="c1"># pylint: enable=invalid-name</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;If&#39;</span><span class="p">,</span> <span class="s1">&#39;IfThenElse&#39;</span><span class="p">,</span> <span class="s1">&#39;Case&#39;</span><span class="p">,</span> <span class="s1">&#39;is_none&#39;</span><span class="p">,</span> <span class="s1">&#39;Ensure&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Pygritia</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Sungkwang Lee.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

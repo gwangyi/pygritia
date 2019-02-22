@@ -1,0 +1,268 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>pygritia.core &#8212; Pygritia 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for pygritia.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Core functionality for lazy expressions</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="k">import</span> <span class="n">setattr_</span>
+
+
+<span class="n">LazyNamespace</span> <span class="o">=</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;LazyMixin&#39;</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span>
+<span class="n">LazyNS</span> <span class="o">=</span> <span class="n">LazyNamespace</span>
+
+
+<div class="viewcode-block" id="LazyAction"><a class="viewcode-back" href="../../api/pygritia.core.html#pygritia.LazyAction">[docs]</a><span class="k">class</span> <span class="nc">LazyAction</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Lazy Expression Handler</span>
+
+<span class="sd">    Every derived LazyAction classes must implements :py:meth:`evaluate` method.</span>
+<span class="sd">    It is called by :py:func:`evaluate` function with given namespace</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;owner&#39;</span><span class="p">,)</span>
+    <span class="n">owner</span><span class="p">:</span> <span class="s1">&#39;LazyMixin&#39;</span>
+    <span class="sd">&quot;&quot;&quot;Owner lazy expression of this action&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;&lt;</span><span class="si">{self.__class__.__name__}</span><span class="s2">: {str(self)}&gt;&quot;</span>
+
+<div class="viewcode-block" id="LazyAction.evaluate"><a class="viewcode-back" href="../../api/pygritia.core.html#pygritia.LazyAction.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">:</span> <span class="n">LazyNamespace</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate expression</span>
+
+<span class="sd">        To substitute actual value for specific symbol, give value with keyword argument.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="LazyAction.update"><a class="viewcode-back" href="../../api/pygritia.core.html#pygritia.LazyAction.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">namespace</span><span class="p">:</span> <span class="n">LazyNamespace</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pylint: disable=no-self-use</span>
+        <span class="sd">&quot;&quot;&quot;Update value of expression</span>
+
+<span class="sd">        If the expression is readonly, it raises AttributeError</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;expr cannot be updated&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="LazyMeta"><a class="viewcode-back" href="../../api/pygritia.core.html#pygritia.LazyMeta">[docs]</a><span class="k">class</span> <span class="nc">LazyMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Metaclass for :py:class:`Lazy`</span>
+
+<span class="sd">    It is for holding global :py:class:`Lazy` factory and creation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_factory</span><span class="p">:</span> <span class="s1">&#39;LazyType&#39;</span>
+
+<div class="viewcode-block" id="LazyMeta.register_factory"><a class="viewcode-back" href="../../api/pygritia.core.html#pygritia.LazyMeta.register_factory">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">register_factory</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lazy_factory</span><span class="p">:</span> <span class="s1">&#39;LazyType&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;LazyType&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set global default :py:class:`Lazy` factory to ``lazy_factory``</span>
+
+<span class="sd">        :param lazy_factory: New default lazy factory</span>
+<span class="sd">        :type lazy_factory: Type[Lazy]</span>
+<span class="sd">        :return: Old default lazy factory</span>
+<span class="sd">        :rtype: Type[Lazy]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">old</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_factory</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;_factory&#39;</span><span class="p">,</span> <span class="n">LazyMixin</span><span class="p">),</span> <span class="n">lazy_factory</span>
+        <span class="k">return</span> <span class="n">old</span></div>
+
+<div class="viewcode-block" id="LazyMeta.create"><a class="viewcode-back" href="../../api/pygritia.core.html#pygritia.LazyMeta.create">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">LazyAction</span><span class="p">,</span> <span class="n">origin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;LazyMixin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;LazyMixin&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create new lazy expression with given action by default lazy factory</span>
+
+<span class="sd">        :param action: Evaluation/update handler for new lazy expression</span>
+<span class="sd">        :type action: LazyAction</span>
+<span class="sd">        :param origin: Lazy expression which cause creation of new expression</span>
+<span class="sd">        :type origin: Optional[LazyMixin]</span>
+<span class="sd">        :return: Newly created lazy expression</span>
+<span class="sd">        :rtype: LazyMixin</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_factory</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">action</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="LazyMixin"><a class="viewcode-back" href="../../api/pygritia.core.html#pygritia.LazyMixin">[docs]</a><span class="k">class</span> <span class="nc">LazyMixin</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">LazyMeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class of all lazy expression and mixin classes</span>
+
+<span class="sd">    It provides *Protocol* for lazy expression</span>
+
+<span class="sd">    All derived classes of this class have ``__hash__`` automatically, because namespace for</span>
+<span class="sd">    evaluate is defined as lazy expression (normally symbol only) to value mapping. Key of</span>
+<span class="sd">    mapping must be hashable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;__action__&#39;</span><span class="p">,</span> <span class="s1">&#39;__weakref__&#39;</span><span class="p">)</span>
+    <span class="n">__action__</span><span class="p">:</span> <span class="n">LazyAction</span>
+
+    <span class="k">def</span> <span class="nf">__init_subclass__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;__hash__&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">LazyMixin</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__action__</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;__hash__&#39;</span><span class="p">,</span> <span class="fm">__hash__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">LazyAction</span><span class="p">,</span> <span class="n">origin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;LazyMixin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">origin</span>
+        <span class="n">setattr_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__action__&#39;</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+        <span class="n">action</span><span class="o">.</span><span class="n">owner</span> <span class="o">=</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__action__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;&lt;</span><span class="si">{self.__class__.__name__}</span><span class="s2">: {str(self)}&gt;&quot;</span></div>
+
+
+<span class="n">Lazy</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;Lazy&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">LazyMixin</span><span class="p">)</span>
+<span class="n">LazyType</span> <span class="o">=</span> <span class="n">Type</span><span class="p">[</span><span class="n">LazyMixin</span><span class="p">]</span>
+<span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;_T&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="evaluate"><a class="viewcode-back" href="../../api/pygritia.core.html#pygritia.evaluate">[docs]</a><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">expr</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="n">namespace</span><span class="p">:</span> <span class="n">LazyNamespace</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Evaluate lazy expression</span>
+
+<span class="sd">    Evaluate expression with symbol substitution according to given ``namespace``</span>
+
+<span class="sd">    :param expr: Lazy expression or evaluated value</span>
+
+<span class="sd">                 If given value is not a lazy expression, this function returns it immediately</span>
+<span class="sd">    :param namespace: Symbol table which will be used in substitution</span>
+
+<span class="sd">                      The key of table can be both of string and symbol expression</span>
+<span class="sd">    :return: Evaluated value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">LazyMixin</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">expr</span><span class="o">.</span><span class="n">__action__</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">namespace</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">expr</span></div>
+
+
+<div class="viewcode-block" id="update"><a class="viewcode-back" href="../../api/pygritia.core.html#pygritia.update">[docs]</a><span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">expr</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="n">namespace</span><span class="p">:</span> <span class="n">LazyNamespace</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Update the value of lazy expression</span>
+
+<span class="sd">    Set the value of lazy expression to the given ``val``</span>
+<span class="sd">    Only *assignable expression* can be updated.</span>
+<span class="sd">    ex) ``this[3]``, ``this.spam``</span>
+
+<span class="sd">    :param expr: Assignable lazy expression</span>
+<span class="sd">    :param val: New value</span>
+<span class="sd">    :param namespace: Symbol table which will be used in substitution</span>
+
+<span class="sd">                      The key of table can be both of string and symbol expression</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">LazyMixin</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expr must be a lazy expression&quot;</span><span class="p">)</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">LazyMixin</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Val is not fully evaluated&quot;</span><span class="p">)</span>
+    <span class="n">expr</span><span class="o">.</span><span class="n">__action__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="repr_"><a class="viewcode-back" href="../../api/pygritia.core.html#pygritia.repr_">[docs]</a><span class="k">def</span> <span class="nf">repr_</span><span class="p">(</span><span class="n">expr</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ``repr()`` for lazy expression</span>
+
+<span class="sd">    Native ``repr`` returns string like ``&#39;&lt;Lazy: this&gt;&#39;``. If you want to get the repr string</span>
+<span class="sd">    like other objects, use this instead of native one. It returns expression only for lazy</span>
+<span class="sd">    expression and ``repr()`` for other object.</span>
+
+<span class="sd">    :param expr: object for repr</span>
+<span class="sd">    :return: repr string of given object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">LazyMixin</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Pygritia</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Sungkwang Lee.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

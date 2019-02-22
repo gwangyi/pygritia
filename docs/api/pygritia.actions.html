@@ -13,6 +13,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
    
@@ -31,100 +32,8 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="module-pygritia.actions">
-<span id="pygritia-actions-module"></span><h1>pygritia.actions module<a class="headerlink" href="#module-pygritia.actions" title="Permalink to this headline">¶</a></h1>
-<p>Define basic lazy expression handlers</p>
-<dl class="class">
-<dt id="pygritia.actions.Attr">
-<em class="property">class </em><code class="descclassname">pygritia.actions.</code><code class="descname">Attr</code><span class="sig-paren">(</span><em>target: pygritia._lazy.Lazy</em>, <em>attr: str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygritia/actions.html#Attr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.actions.Attr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pygritia._actions.LazyAction</span></code></p>
-<p>Attr accessor</p>
-<dl class="attribute">
-<dt id="pygritia.actions.Attr.attr">
-<code class="descname">attr</code><a class="headerlink" href="#pygritia.actions.Attr.attr" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pygritia.actions.Attr.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="../_modules/pygritia/actions.html#Attr.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.actions.Attr.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate expression</p>
-<p>To substitute actual value for specific symbol, give value with keyword argument.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pygritia.actions.Attr.target">
-<code class="descname">target</code><a class="headerlink" href="#pygritia.actions.Attr.target" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pygritia.actions.Attr.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>val: Any</em>, <em>**kwargs</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/pygritia/actions.html#Attr.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.actions.Attr.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update value of expression</p>
-<p>If the expression is readonly, it raises AttributeError</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pygritia.actions.Call">
-<em class="property">class </em><code class="descclassname">pygritia.actions.</code><code class="descname">Call</code><span class="sig-paren">(</span><em>target: Any, args: Tuple[Any, ...], kwargs: Mapping[str, Any]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygritia/actions.html#Call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.actions.Call" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pygritia._actions.LazyAction</span></code></p>
-<p>Function call</p>
-<dl class="attribute">
-<dt id="pygritia.actions.Call.args">
-<code class="descname">args</code><a class="headerlink" href="#pygritia.actions.Call.args" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pygritia.actions.Call.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="../_modules/pygritia/actions.html#Call.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.actions.Call.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate expression</p>
-<p>To substitute actual value for specific symbol, give value with keyword argument.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pygritia.actions.Call.kwargs">
-<code class="descname">kwargs</code><a class="headerlink" href="#pygritia.actions.Call.kwargs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="pygritia.actions.Call.target">
-<code class="descname">target</code><a class="headerlink" href="#pygritia.actions.Call.target" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pygritia.actions.Item">
-<em class="property">class </em><code class="descclassname">pygritia.actions.</code><code class="descname">Item</code><span class="sig-paren">(</span><em>target: Any</em>, <em>index: Any</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pygritia/actions.html#Item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.actions.Item" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pygritia._actions.LazyAction</span></code></p>
-<p>Item accessor</p>
-<dl class="method">
-<dt id="pygritia.actions.Item.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="../_modules/pygritia/actions.html#Item.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.actions.Item.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate expression</p>
-<p>To substitute actual value for specific symbol, give value with keyword argument.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pygritia.actions.Item.index">
-<code class="descname">index</code><a class="headerlink" href="#pygritia.actions.Item.index" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="pygritia.actions.Item.target">
-<code class="descname">target</code><a class="headerlink" href="#pygritia.actions.Item.target" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pygritia.actions.Item.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>val: Any</em>, <em>**kwargs</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/pygritia/actions.html#Item.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.actions.Item.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update value of expression</p>
-<p>If the expression is readonly, it raises AttributeError</p>
-</dd></dl>
-
-</dd></dl>
-
+  <div class="section" id="pygritia-actions-module">
+<h1>pygritia.actions module<a class="headerlink" href="#pygritia-actions-module" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -180,7 +89,7 @@
       &copy;2019, Sungkwang Lee.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

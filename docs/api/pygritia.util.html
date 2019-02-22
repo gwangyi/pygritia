@@ -13,6 +13,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
    
@@ -34,19 +35,6 @@
   <div class="section" id="module-pygritia.util">
 <span id="pygritia-util-module"></span><h1>pygritia.util module<a class="headerlink" href="#module-pygritia.util" title="Permalink to this headline">¶</a></h1>
 <p>Define some useful functions</p>
-<dl class="function">
-<dt id="pygritia.util.copy_">
-<code class="descclassname">pygritia.util.</code><code class="descname">copy_</code><span class="sig-paren">(</span><em>obj: _T</em><span class="sig-paren">)</span> &#x2192; _T<a class="reference internal" href="../_modules/pygritia/util.html#copy_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.util.copy_" title="Permalink to this definition">¶</a></dt>
-<dd><p>Copy object with <cite>__slots__</cite></p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pygritia.util.evaluate">
-<code class="descclassname">pygritia.util.</code><code class="descname">evaluate</code><span class="sig-paren">(</span><em>obj: _T</em>, <em>**kwargs</em><span class="sig-paren">)</span> &#x2192; _T<a class="reference internal" href="../_modules/pygritia/util.html#evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.util.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate expression</p>
-<p>To substitute actual value for specific symbol, give value with keyword argument.</p>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="pygritia.util.getattr_">
 <code class="descclassname">pygritia.util.</code><code class="descname">getattr_</code><a class="headerlink" href="#pygritia.util.getattr_" title="Permalink to this definition">¶</a></dt>
@@ -57,14 +45,6 @@
 <dt id="pygritia.util.setattr_">
 <code class="descclassname">pygritia.util.</code><code class="descname">setattr_</code><a class="headerlink" href="#pygritia.util.setattr_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implement setattr(self, name, value).</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pygritia.util.update">
-<code class="descclassname">pygritia.util.</code><code class="descname">update</code><span class="sig-paren">(</span><em>obj: _T</em>, <em>val: _T</em>, <em>**kwargs</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/pygritia/util.html#update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.util.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the value of expression</p>
-<p>To substitute actual value for specific symbol, give value with keyword argument.</p>
-<p>Given val must not have any symbol not resolved.</p>
 </dd></dl>
 
 </div>
@@ -122,7 +102,7 @@
       &copy;2019, Sungkwang Lee.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

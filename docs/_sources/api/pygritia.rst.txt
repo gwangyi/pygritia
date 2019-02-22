@@ -6,9 +6,19 @@ Submodules
 
 .. toctree::
 
-   pygritia.actions
+   pygritia.attr
+   pygritia.binary
+   pygritia.call
+   pygritia.cases
+   pygritia.cast
+   pygritia.core
+   pygritia.item
    pygritia.lazy
-   pygritia.lazyop
+   pygritia.ops
+   pygritia.prop
+   pygritia.rbinary
+   pygritia.symbols
+   pygritia.unary
    pygritia.util
 
 Module contents

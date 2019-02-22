@@ -1,7 +1,7 @@
-pygritia.actions module
+pygritia.symbols module
 =======================
 
-.. automodule:: pygritia.actions
+.. automodule:: pygritia.symbols
     :members:
     :undoc-members:
     :show-inheritance:

@@ -1,7 +1,7 @@
-pygritia.lazyop module
+pygritia.symbol module
 ======================
 
-.. automodule:: pygritia.lazyop
+.. automodule:: pygritia.symbol
     :members:
     :undoc-members:
     :show-inheritance:

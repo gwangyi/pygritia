@@ -13,6 +13,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
    
@@ -37,33 +38,111 @@
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="pygritia.actions.html">pygritia.actions module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pygritia.attr.html">pygritia.attr module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pygritia.binary.html">pygritia.binary module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pygritia.call.html">pygritia.call module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pygritia.cases.html">pygritia.cases module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pygritia.cast.html">pygritia.cast module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pygritia.core.html">pygritia.core module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pygritia.item.html">pygritia.item module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pygritia.lazy.html">pygritia.lazy module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pygritia.lazyop.html">pygritia.lazyop module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pygritia.ops.html">pygritia.ops module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pygritia.prop.html">pygritia.prop module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pygritia.rbinary.html">pygritia.rbinary module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pygritia.symbols.html">pygritia.symbols module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pygritia.unary.html">pygritia.unary module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pygritia.util.html">pygritia.util module</a></li>
 </ul>
 </div>
 </div>
 <div class="section" id="module-pygritia">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pygritia" title="Permalink to this headline">¶</a></h2>
-<p>Pygritia: Lazy evaluation</p>
+<div class="section" id="pygritia-lazy-evaluation">
+<h3>Pygritia: Lazy Evaluation<a class="headerlink" href="#pygritia-lazy-evaluation" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Build expressions naturally</li>
+<li>Evaluate expression with symbol substitution</li>
+<li>Create property by a expression with special symbol</li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Spam</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">egg</span> <span class="o">=</span> <span class="p">[</span><span class="mi">42</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">foo</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">egg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spam</span> <span class="o">=</span> <span class="n">Spam</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">egg</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">this.egg * 2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">evaluate</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">egg</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="p">{</span><span class="n">this</span><span class="p">:</span> <span class="n">spam</span><span class="p">})</span>
+<span class="go">[42, 42]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spam</span><span class="o">.</span><span class="n">foo</span>
+<span class="go">42</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spam</span><span class="o">.</span><span class="n">foo</span> <span class="o">=</span> <span class="mi">9</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spam</span><span class="o">.</span><span class="n">egg</span>
+<span class="go">[9]</span>
+</pre></div>
+</div>
 <dl class="function">
-<dt id="pygritia.symbol">
-<code class="descclassname">pygritia.</code><code class="descname">symbol</code><span class="sig-paren">(</span><em>name: str</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="../_modules/pygritia/lazy.html#symbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.symbol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create lazy-evaluatable symbol</p>
+<dt id="pygritia.evaluate">
+<code class="descclassname">pygritia.</code><code class="descname">evaluate</code><span class="sig-paren">(</span><em>expr: _T, namespace: Mapping[Union[str, LazyMixin], Any]</em><span class="sig-paren">)</span> &#x2192; _T<a class="reference internal" href="../_modules/pygritia/core.html#evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate lazy expression</p>
+<p>Evaluate expression with symbol substitution according to given <code class="docutils literal notranslate"><span class="pre">namespace</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>expr</strong> – <p>Lazy expression or evaluated value</p>
+<p>If given value is not a lazy expression, this function returns it immediately</p>
+</li>
+<li><strong>namespace</strong> – <p>Symbol table which will be used in substitution</p>
+<p>The key of table can be both of string and symbol expression</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Evaluated value</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
-<dt id="pygritia.symbols">
-<code class="descclassname">pygritia.</code><code class="descname">symbols</code><span class="sig-paren">(</span><em>obj: Any</em><span class="sig-paren">)</span> &#x2192; Optional[Set[str]]<a class="reference internal" href="../_modules/pygritia/lazy.html#symbols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.symbols" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return symbols not resolved.</p>
-<p>If given object is not a lazy expr, returns None.</p>
+<dt id="pygritia.lazy_call">
+<code class="descclassname">pygritia.</code><code class="descname">lazy_call</code><span class="sig-paren">(</span><em>func: _T</em><span class="sig-paren">)</span> &#x2192; _T<a class="reference internal" href="../_modules/pygritia/call.html#lazy_call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.lazy_call" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a function to support lazy expression</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pygritia</span> <span class="k">import</span> <span class="n">this</span><span class="p">,</span> <span class="n">lazy_call</span><span class="p">,</span> <span class="n">evaluate</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@lazy_call</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">hello</span><span class="p">(</span><span class="n">this</span><span class="p">))</span>
+<span class="go">hello(this)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hello</span><span class="p">(</span><span class="s2">&quot;123&quot;</span><span class="p">)</span>
+<span class="go">123</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">evaluate</span><span class="p">(</span><span class="n">hello</span><span class="p">(</span><span class="n">this</span><span class="p">),</span> <span class="p">{</span><span class="n">this</span><span class="p">:</span> <span class="s2">&quot;123&quot;</span><span class="p">})</span>
+<span class="go">123</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="function">
-<dt id="pygritia.lazy_function">
-<code class="descclassname">pygritia.</code><code class="descname">lazy_function</code><span class="sig-paren">(</span><em>func: _T</em><span class="sig-paren">)</span> &#x2192; _T<a class="reference internal" href="../_modules/pygritia/lazy.html#lazy_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.lazy_function" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decorator that makes function able to handle lazy expr</p>
+<dt id="pygritia.lazy_delattr">
+<code class="descclassname">pygritia.</code><code class="descname">lazy_delattr</code><span class="sig-paren">(</span><em>obj</em>, <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#pygritia.lazy_delattr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the named attribute from the given object.</p>
+<p>delattr(x, ‘y’) is equivalent to <a href="#id1"><span class="problematic" id="id2">``</span></a>del x.y’‘</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygritia.lazy_delitem">
+<code class="descclassname">pygritia.</code><code class="descname">lazy_delitem</code><span class="sig-paren">(</span><em>a</em>, <em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#pygritia.lazy_delitem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as del a[b].</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygritia.lazy_getattr">
+<code class="descclassname">pygritia.</code><code class="descname">lazy_getattr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pygritia.lazy_getattr" title="Permalink to this definition">¶</a></dt>
+<dd><p>getattr(object, name[, default]) -&gt; value</p>
+<p>Get a named attribute from an object; getattr(x, ‘y’) is equivalent to x.y.
+When a default argument is given, it is returned when the attribute doesn’t
+exist; without it, an exception is raised in that case.</p>
 </dd></dl>
 
 <dl class="function">
@@ -73,26 +152,118 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="pygritia.lazy_setattr">
+<code class="descclassname">pygritia.</code><code class="descname">lazy_setattr</code><span class="sig-paren">(</span><em>obj</em>, <em>name</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#pygritia.lazy_setattr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the named attribute on the given object to the specified value.</p>
+<p>setattr(x, ‘y’, v) is equivalent to <a href="#id3"><span class="problematic" id="id4">``</span></a>x.y = v’‘</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="pygritia.lazy_setitem">
 <code class="descclassname">pygritia.</code><code class="descname">lazy_setitem</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#pygritia.lazy_setitem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Same as a[b] = c.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="pygritia.evaluate">
-<code class="descclassname">pygritia.</code><code class="descname">evaluate</code><span class="sig-paren">(</span><em>obj: _T</em>, <em>**kwargs</em><span class="sig-paren">)</span> &#x2192; _T<a class="reference internal" href="../_modules/pygritia/util.html#evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate expression</p>
-<p>To substitute actual value for specific symbol, give value with keyword argument.</p>
+<dt id="pygritia.symbol">
+<code class="descclassname">pygritia.</code><code class="descname">symbol</code><span class="sig-paren">(</span><em>name: str</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="../_modules/pygritia/lazy.html#symbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.symbol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create symbol for lazy expression</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Newly created symbol expression</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Any</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="pygritia.update">
-<code class="descclassname">pygritia.</code><code class="descname">update</code><span class="sig-paren">(</span><em>obj: _T</em>, <em>val: _T</em>, <em>**kwargs</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/pygritia/util.html#update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the value of expression</p>
-<p>To substitute actual value for specific symbol, give value with keyword argument.</p>
-<p>Given val must not have any symbol not resolved.</p>
+<code class="descclassname">pygritia.</code><code class="descname">update</code><span class="sig-paren">(</span><em>expr: _T, val: _T, namespace: Mapping[Union[str, LazyMixin], Any]</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/pygritia/core.html#update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the value of lazy expression</p>
+<p>Set the value of lazy expression to the given <code class="docutils literal notranslate"><span class="pre">val</span></code>
+Only <em>assignable expression</em> can be updated.
+ex) <code class="docutils literal notranslate"><span class="pre">this[3]</span></code>, <code class="docutils literal notranslate"><span class="pre">this.spam</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>expr</strong> – Assignable lazy expression</li>
+<li><strong>val</strong> – New value</li>
+<li><strong>namespace</strong> – <p>Symbol table which will be used in substitution</p>
+<p>The key of table can be both of string and symbol expression</p>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="pygritia.this">
+<code class="descclassname">pygritia.</code><code class="descname">this</code><a class="headerlink" href="#pygritia.this" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pygritia.If">
+<code class="descclassname">pygritia.</code><code class="descname">If</code><span class="sig-paren">(</span><em>cond: bool</em>, <em>value: _T</em><span class="sig-paren">)</span> &#x2192; Optional[_T]<a class="reference internal" href="../_modules/pygritia/cases.html#If"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.If" title="Permalink to this definition">¶</a></dt>
+<dd><p>value if cond else None</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygritia.IfThenElse">
+<code class="descclassname">pygritia.</code><code class="descname">IfThenElse</code><span class="sig-paren">(</span><em>cond: bool</em>, <em>true: _T</em>, <em>false: _U</em><span class="sig-paren">)</span> &#x2192; Union[_T, _U]<a class="reference internal" href="../_modules/pygritia/cases.html#IfThenElse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.IfThenElse" title="Permalink to this definition">¶</a></dt>
+<dd><p>true if cond else false</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygritia.Case">
+<code class="descclassname">pygritia.</code><code class="descname">Case</code><span class="sig-paren">(</span><em>cond: _T, cases: Mapping[_T, _U], default: _U</em><span class="sig-paren">)</span> &#x2192; _U<a class="reference internal" href="../_modules/pygritia/cases.html#Case"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.Case" title="Permalink to this definition">¶</a></dt>
+<dd><p>cases.get(cond, default)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygritia.Ensure">
+<code class="descclassname">pygritia.</code><code class="descname">Ensure</code><span class="sig-paren">(</span><em>obj: Optional[_T], default: _T</em><span class="sig-paren">)</span> &#x2192; _T<a class="reference internal" href="../_modules/pygritia/cases.html#Ensure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.Ensure" title="Permalink to this definition">¶</a></dt>
+<dd><p>obj if obj is not None else default</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygritia.is_none">
+<code class="descclassname">pygritia.</code><code class="descname">is_none</code><span class="sig-paren">(</span><em>obj: Any</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="../_modules/pygritia/cases.html#is_none"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.is_none" title="Permalink to this definition">¶</a></dt>
+<dd><p>obj is None</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygritia.lazy_cast">
+<code class="descclassname">pygritia.</code><code class="descname">lazy_cast</code><span class="sig-paren">(</span><em>target_type: Callable[[_T], _U], expr: _T, expr_type: Optional[Callable[[_U], _T]] = None</em><span class="sig-paren">)</span> &#x2192; _U<a class="reference internal" href="../_modules/pygritia/cast.html#lazy_cast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygritia.lazy_cast" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create automatic casting lazy expression</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>target_type</strong> – Converter from expression type to result type</li>
+<li><strong>expr</strong> – Target expression</li>
+<li><strong>expr_type</strong> – <p>Converter from result type to expression type</p>
+<p>If it is omitted, the constructor of evaluated expr will be used.</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Casting expression</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 </div>
 </div>
 
@@ -149,7 +320,7 @@
       &copy;2019, Sungkwang Lee.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

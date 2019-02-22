@@ -13,6 +13,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -32,150 +33,39 @@
           <div class="body" role="main">
             
   <h1>Source code for pygritia.lazy</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Lazy expression generator&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">wraps</span>
-<span class="kn">import</span> <span class="nn">operator</span>
-<span class="kn">from</span> <span class="nn">._lazy</span> <span class="k">import</span> <span class="n">Lazy</span> <span class="k">as</span> <span class="n">Lazy_</span>
-<span class="kn">from</span> <span class="nn">.actions</span> <span class="k">import</span> <span class="n">Attr</span><span class="p">,</span> <span class="n">Item</span><span class="p">,</span> <span class="n">Call</span>
-<span class="kn">from</span> <span class="nn">.util</span> <span class="k">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">copy_</span><span class="p">,</span> <span class="n">getattr_</span><span class="p">,</span> <span class="n">setattr_</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Provides :py:class:`Lazy` class and :py:func:`symbol`</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">.symbols</span> <span class="k">import</span> <span class="n">Symbol</span>
+<span class="kn">from</span> <span class="nn">.attr</span> <span class="k">import</span> <span class="n">AttrMixin</span>
+<span class="kn">from</span> <span class="nn">.item</span> <span class="k">import</span> <span class="n">ItemMixin</span>
+<span class="kn">from</span> <span class="nn">.call</span> <span class="k">import</span> <span class="n">CallMixin</span>
+<span class="kn">from</span> <span class="nn">.unary</span> <span class="k">import</span> <span class="n">UnaryMixin</span>
+<span class="kn">from</span> <span class="nn">.binary</span> <span class="k">import</span> <span class="n">BinaryMixin</span>
+<span class="kn">from</span> <span class="nn">.rbinary</span> <span class="k">import</span> <span class="n">ReversedBinaryMixin</span>
 
 
-<span class="n">_Lazy</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;_Lazy&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s1">&#39;Lazy&#39;</span><span class="p">)</span>
-<span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;_T&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="Lazy"><a class="viewcode-back" href="../../api/pygritia.lazy.html#pygritia.Lazy">[docs]</a><span class="k">class</span> <span class="nc">Lazy</span><span class="p">(</span><span class="n">AttrMixin</span><span class="p">,</span> <span class="n">ItemMixin</span><span class="p">,</span> <span class="n">CallMixin</span><span class="p">,</span> <span class="n">UnaryMixin</span><span class="p">,</span>
+           <span class="n">BinaryMixin</span><span class="p">,</span> <span class="n">ReversedBinaryMixin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Minimal base class of lazy expressions</span>
 
+<span class="sd">    To extend functionality of lazy expressions(i.e. property descriptor from expression),</span>
+<span class="sd">    create a new class which is derived from this class.</span>
 
-<div class="viewcode-block" id="Lazy"><a class="viewcode-back" href="../../api/pygritia.lazy.html#pygritia.Lazy">[docs]</a><span class="k">class</span> <span class="nc">Lazy</span><span class="p">(</span><span class="n">Lazy_</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Lazy expression generator</span>
+<span class="sd">    Each functionality of :py:class:`Lazy` is implemented in the base mixin classes.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
 
-<span class="sd">    This class is entrypoint of lazy expression</span>
-
-<span class="sd">    &gt;&gt;&gt; a = Lazy(&#39;a&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; a</span>
-<span class="sd">    a</span>
-<span class="sd">    &gt;&gt;&gt; a + 1</span>
-<span class="sd">    a + 1</span>
-<span class="sd">    &gt;&gt;&gt; a + 2 * 3</span>
-<span class="sd">    a + 6</span>
-<span class="sd">    &gt;&gt;&gt; a.b</span>
-<span class="sd">    a.b</span>
-<span class="sd">    &gt;&gt;&gt; a(a, 1 + 2, b=3)</span>
-<span class="sd">    a(a, 3, b=3)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">_Lazy</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Lazy</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span>
-                <span class="s1">&#39;__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">OPERATORS</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">getattr_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
-
-        <span class="n">new</span> <span class="o">=</span> <span class="n">copy_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">act</span> <span class="o">=</span> <span class="n">getattr_</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__action__&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">act</span><span class="p">,</span> <span class="n">Attr</span><span class="p">):</span>
-            <span class="n">setattr_</span><span class="p">(</span>
-                <span class="n">new</span><span class="p">,</span>
-                <span class="s1">&#39;__action__&#39;</span><span class="p">,</span>
-                <span class="n">Attr</span><span class="p">(</span>
-                    <span class="n">act</span><span class="o">.</span><span class="n">target</span><span class="p">,</span>
-                    <span class="n">act</span><span class="o">.</span><span class="n">attr</span> <span class="o">+</span>
-                    <span class="s1">&#39;.&#39;</span> <span class="o">+</span>
-                    <span class="n">name</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">setattr_</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__action__&#39;</span><span class="p">,</span> <span class="n">Attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
-        <span class="n">setattr_</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__name__&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__clone__&#39;</span><span class="p">):</span>
-            <span class="n">getattr_</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__clone__&#39;</span><span class="p">)()</span>
-
-        <span class="k">return</span> <span class="n">new</span>
-
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">_Lazy</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Lazy</span><span class="p">:</span>
-        <span class="n">new</span> <span class="o">=</span> <span class="n">copy_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">Lazy</span><span class="p">):</span>
-            <span class="n">syms</span> <span class="o">=</span> <span class="n">getattr_</span><span class="p">(</span>
-                <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__symbols__&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
-                    <span class="n">getattr_</span><span class="p">(</span>
-                        <span class="n">idx</span><span class="p">,</span> <span class="s1">&#39;__symbols__&#39;</span><span class="p">))</span>
-            <span class="n">setattr_</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__symbols__&#39;</span><span class="p">,</span> <span class="n">syms</span><span class="p">)</span>
-        <span class="n">setattr_</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__action__&#39;</span><span class="p">,</span> <span class="n">Item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">))</span>
-        <span class="n">setattr_</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__name__&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__clone__&#39;</span><span class="p">):</span>
-            <span class="n">getattr_</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__clone__&#39;</span><span class="p">)()</span>
-
-        <span class="k">return</span> <span class="n">new</span>
-
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">_Lazy</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_Lazy</span><span class="p">:</span>
-        <span class="n">new</span> <span class="o">=</span> <span class="n">copy_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">syms</span> <span class="o">=</span> <span class="n">getattr_</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__symbols__&#39;</span><span class="p">)</span>
-        <span class="n">syms</span><span class="o">.</span><span class="n">union</span><span class="p">({</span>
-            <span class="n">sym</span>
-            <span class="k">for</span> <span class="n">arglist</span> <span class="ow">in</span> <span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-            <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">arglist</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">Lazy</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">sym</span> <span class="ow">in</span> <span class="n">getattr_</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s1">&#39;__symbols__&#39;</span><span class="p">)</span>
-        <span class="p">})</span>
-        <span class="n">setattr_</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__symbols__&#39;</span><span class="p">,</span> <span class="n">syms</span><span class="p">)</span>
-        <span class="n">setattr_</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__action__&#39;</span><span class="p">,</span> <span class="n">Call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
-        <span class="n">setattr_</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__name__&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__clone__&#39;</span><span class="p">):</span>
-            <span class="n">getattr_</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="s1">&#39;__clone__&#39;</span><span class="p">)()</span>
-
-        <span class="k">return</span> <span class="n">new</span>
-
-    <span class="k">def</span> <span class="nf">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Placeholder for unary operator warning&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__pos__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Placeholder for unary operator warning&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Placeholder for unary operator warning&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__invert__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Placeholder for unary operator warning&quot;&quot;&quot;</span></div>
-
-
-<div class="viewcode-block" id="lazy_function"><a class="viewcode-back" href="../../api/pygritia.lazy.html#pygritia.lazy_function">[docs]</a><span class="k">def</span> <span class="nf">lazy_function</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">_T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Decorator that makes function able to handle lazy expr&quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-        <span class="n">func_</span> <span class="o">=</span> <span class="n">func</span>
-
-        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-            <span class="n">symbols_</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">sym</span>
-                <span class="k">for</span> <span class="n">arglist</span> <span class="ow">in</span> <span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-                <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">arglist</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">Lazy</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">sym</span> <span class="ow">in</span> <span class="n">getattr_</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s1">&#39;__symbols__&#39;</span><span class="p">)</span>
-            <span class="p">}</span>
-            <span class="k">if</span> <span class="n">symbols_</span><span class="p">:</span>
-                <span class="n">lazy</span> <span class="o">=</span> <span class="n">Lazy</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">)</span>
-                <span class="n">setattr_</span><span class="p">(</span><span class="n">lazy</span><span class="p">,</span> <span class="s1">&#39;__symbols__&#39;</span><span class="p">,</span> <span class="n">symbols_</span><span class="p">)</span>
-                <span class="n">setattr_</span><span class="p">(</span><span class="n">lazy</span><span class="p">,</span> <span class="s1">&#39;__name__&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-                <span class="n">setattr_</span><span class="p">(</span><span class="n">lazy</span><span class="p">,</span> <span class="s1">&#39;__action__&#39;</span><span class="p">,</span> <span class="n">Call</span><span class="p">(</span><span class="n">func_</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
-                <span class="k">return</span> <span class="n">lazy</span>
-            <span class="k">return</span> <span class="n">func_</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">wrapped</span><span class="p">)</span>
-    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;lazy_function must be applied to callable&quot;</span><span class="p">)</span></div>
-
-<span class="c1"># pylint: disable=invalid-name</span>
-<span class="n">lazy_getitem</span> <span class="o">=</span> <span class="n">lazy_function</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">getitem</span><span class="p">)</span>
-<span class="n">lazy_setitem</span> <span class="o">=</span> <span class="n">lazy_function</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">setitem</span><span class="p">)</span>
-<span class="c1"># pylint: enable=invalid-name</span>
 
 <div class="viewcode-block" id="symbol"><a class="viewcode-back" href="../../api/pygritia.lazy.html#pygritia.symbol">[docs]</a><span class="k">def</span> <span class="nf">symbol</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Create lazy-evaluatable symbol&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">Lazy</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create symbol for lazy expression</span>
 
-<div class="viewcode-block" id="symbols"><a class="viewcode-back" href="../../api/pygritia.lazy.html#pygritia.symbols">[docs]</a><span class="k">def</span> <span class="nf">symbols</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;Return symbols not resolved.</span>
-
-<span class="sd">    If given object is not a lazy expr, returns None.</span>
+<span class="sd">    :return: Newly created symbol expression</span>
+<span class="sd">    :rtype: Any</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Lazy</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">getattr_</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;__symbols__&#39;</span><span class="p">))</span>
-    <span class="k">return</span> <span class="kc">None</span></div>
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">Lazy</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">Symbol</span><span class="p">(</span><span class="n">name</span><span class="p">)))</span></div>
 </pre></div>
 
           </div>
@@ -232,7 +122,7 @@
       &copy;2019, Sungkwang Lee.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>
